@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String    @unique
+  password      String
+  picturePath   String?   @default("") @map("picture_path")
+  coverPath     String?   @default("")
+  friends       String[]  @default([])
+  location      String?
+  occupation    String?
+  viewedProfile Int?
+  impressions   Int?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  posts         Post[]    @relation("posts")
+  comments      Comment[]
+  likedPosts    Post[]    @relation("likes", fields: [likedPostIDs], references: [id])
+  likedPostIDs  String[]  @default([]) @db.ObjectId
+
+  @@map("users")
+}
+
+model Post {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  user        User      @relation("posts", fields: [userId], references: [id])
+  userId      String    @db.ObjectId
+  createdAt   DateTime  @default(now()) @map("created_at")
+  comments    Comment[]
+  likes       User[]    @relation("likes", fields: [likedIDs], references: [id])
+  likedIDs    String[]  @default([]) @db.ObjectId
+  location    String?
+  description String?
+  picturePath String?   @map("picture_path")
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  comment   String
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String   @db.ObjectId
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("comments")
+}
