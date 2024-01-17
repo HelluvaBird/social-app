@@ -34,7 +34,7 @@ export default function EditModal() {
   };
   const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (!e.target.files) return;
-    if (e.target.name === 'profilePicture') {
+    if (e.target.name === 'picturePath') {
       setProfilePicture(e.target.files[0]);
     } else {
       setCoverPicture(e.target.files[0]);
